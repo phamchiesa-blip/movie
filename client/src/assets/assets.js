@@ -330,4 +330,17 @@ export const dummyBookingData = [
         "bookedSeats": ["A1", "A2","A3"],
         "isPaid": true,
     },
+];
+
+export const cinemaName = [
+    {id: 1, name: 'Aeon Mall Ha Dong', address: 'Noi Street, Duong Noi Ward, Hanoi'},
+    {id: 2, name: 'Aeon Mall Long Bien', address: 'Co Linh Street, Long Bien Ward, Hanoi'},
+    {id: 3, name: 'Royal City', address: 'Nguyen Trai Street, Thanh Xuan Ward, Hanoi'},
+    {id: 4, name: 'Times City', address: 'Minh Khai Street, Vinh Tuy Ward, Hanoi'},
+    {id: 5, name: 'Rice City', address: 'Linh Dam Street, Hoang Liet Ward, Hanoi'},
+    {id: 6, name: 'Aeon Mall Xuan Thuy', address: 'Xuan Thuy Street, Cau Giay Ward, Hanoi'},
+    {id: 7, name: 'Go Thang Long', address: 'Pham Hung Street, My Dinh Ward, Hanoi'},
+    {id: 8, name: 'West Lake Mall', address: 'Lac Long Quan Street, Tay Ho Ward, Hanoi'},
+    {id: 9, name: 'Hanoi Center', address: 'Nguyen Thai Hoc Street, Giang Vo Ward, Hanoi'},
+    {id: 10, name: 'Ocean City', address: 'Ngoc Trai Street, Van Giang Ward, Hung Yen'},
 ]
