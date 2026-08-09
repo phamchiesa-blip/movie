@@ -1,11 +1,15 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import Title from '../../components/admin/Title'
 import {dummyShowsData} from '../../assets/assets'
 import Loading from '../../components/Loading'
 import {CheckIcon, DeleteIcon, StarIcon} from 'lucide-react'
 import {kConverter} from '../../lib/kConverter'
+import { useAppContext } from '../../context/AppContext';
 
 const AddShow = () => {
+  const {axios, getToken, user, base_image} = useAppContext();
+
   const currency = import.meta.env.VITE_CURRENCY;
 
   const [nowPlayingMovies, setNowPlayingMovies] = useState([]);
@@ -13,9 +17,26 @@ const AddShow = () => {
   const [dateTimeSelection, setDateTimeSection] = useState({});
   const [datetimeInput, setDateTimeInput] = useState('');
   const [showPrice, setShowPrice] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   const fetchNowPlayingMovies = async () => {
-    setNowPlayingMovies(dummyShowsData);
+    setIsLoading(true);
+    setLoadError('');
+    try {
+      const {data} = await axios.get("/api/show/now-playing",
+      {headers: {Authorization: `Bearer ${await getToken()}`}});
+      if(data.success) {
+        setNowPlayingMovies(data.movies || []);
+      } else {
+        setLoadError(data.message || 'Could not load movies.');
+      }
+    } catch (error) {
+      console.log("Error fetching movies: " + error);
+      setLoadError(error?.message || 'Error fetching movies.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const handleDateTimeAdd = () => {
@@ -36,7 +57,7 @@ const AddShow = () => {
     setDateTimeSection(prev => {
       const filteredTimes = prev[date].filter(t=> t !== time);
       if(filteredTimes.length === 0) {
-        const {[date]: _, ...rest} = prev;
+        const { ...rest} = prev;
         return rest;
       }
       return {
@@ -51,6 +72,23 @@ const AddShow = () => {
     fetchNowPlayingMovies();
   }, []);
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (loadError) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
+        <p className="text-red-500 font-medium mb-4">{loadError}</p>
+        <button
+          onClick={fetchNowPlayingMovies}
+          className="bg-primary text-white px-6 py-2 rounded-md"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return nowPlayingMovies.length > 0 ? (
     <>
@@ -63,7 +101,7 @@ const AddShow = () => {
               key={movie.id} className={`relative max-w-40 cursor-pointer
               group-hover:not-hover:opacity-40 hover:-translate-y-1 transition duration-300`}>
                 <div className="relative rounded-lg overflow-hidden">
-                  <img src={movie.poster_path} className="w-full object-cover brightness-90" />
+                  <img src={base_image + movie.poster_path} className="w-full object-cover brightness-90" />
                   <div className="text-sm flex items-center justify-between p-2 
                   bg-black/70 w-full absolute bottom-0 left-0">
                     <p className="flex items-center gap-1 text-gray-400">
@@ -132,9 +170,13 @@ const AddShow = () => {
         </div>
       )}
       <button className='bg-primary text-white px-8 py-2 mt-6 rounded
-      hover:gb-primary/90 transition-all cursor-pointer'>Add Show</button>
+      hover:bg-primary/90 transition-all cursor-pointer'>Add Show</button>
     </>
-  ) : <Loading />
+  ) : (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <p className="text-gray-500">No now playing movies available.</p>
+    </div>
+  )
 }
 
 export default AddShow
